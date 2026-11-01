@@ -177,10 +177,7 @@ body {
 }
 
 .typewriter {
-    border-right: 3px solid var(--primary-color);
-    white-space: nowrap;
-    overflow: hidden;
-    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    animation: fadeInDown 1s ease-in-out;
 }
 
 .hero-buttons {
