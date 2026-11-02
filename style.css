@@ -1595,3 +1595,23 @@ body {
 body.modal-open {
     overflow: hidden;
 }
+
+.cert-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+.verify-link {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.verify-link:hover {
+    text-decoration: underline;
+}
+.cert-info {
+    flex: 1;
+    text-align: left;
+}
