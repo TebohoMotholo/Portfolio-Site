@@ -1428,10 +1428,12 @@ body {
 
 /* ---------- Timeline logo ---------- */
 .timeline-content img.timeline-logo {
-    width: auto;
-    max-width: 220px;
     display: block;
-    padding: 12px 18px;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin: 1.25rem auto 0.25rem;
+    padding: 16px 24px;
     background: #fff;
     border-radius: 12px;
 }
