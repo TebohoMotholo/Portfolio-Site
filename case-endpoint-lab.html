@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Study: Endpoint Migration Lab - Teboho Motholo</title>
+    <meta name="description" content="A Proxmox home lab with pfSense and Active Directory for practising an SCCM to Intune migration: GPO, apps, reporting and Intune Suite.">
+    <meta name="theme-color" content="#2c3e50">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Teboho Motholo">
+    <meta property="og:title" content="Case Study: Endpoint Migration Lab - Teboho Motholo">
+    <meta property="og:description" content="A Proxmox home lab with pfSense and Active Directory for practising an SCCM to Intune migration: GPO, apps, reporting and Intune Suite.">
+    <meta property="og:image" content="__SITE_URL__/images/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpg" href="images/logo.png">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T4T293RZ');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <img loading="lazy" decoding="async" src="images/logo.png" alt="Teboho Motholo Logo">
+                </a>
+                <div class="hamburger" id="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link">HOME</a></li>
+                    <li class="nav-item"><a href="about.html" class="nav-link">ABOUT</a></li>
+                    <li class="nav-item"><a href="education.html" class="nav-link">EDUCATION</a></li>
+                    <li class="nav-item"><a href="skills.html" class="nav-link">SKILLS</a></li>
+                    <li class="nav-item"><a href="employment.html" class="nav-link">EXPERIENCE</a></li>
+                    <li class="nav-item"><a href="projects.html" class="nav-link active">PROJECTS</a></li>
+                    <li class="nav-item"><a href="notes.html" class="nav-link">NOTES</a></li>
+                    <li class="nav-item"><a href="contact.html" class="nav-link">CONTACT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="case">
+        <div class="container case-wrap">
+            <a class="back-link" href="projects.html"><i class="fas fa-arrow-left"></i> Back to projects</a>
+            <header class="case-head">
+                <p class="case-kicker">Case study</p>
+                <h1>Endpoint migration lab</h1>
+                <p class="case-lead">A Proxmox lab for practising an SCCM to Intune migration end to end.</p>
+                <ul class="chips"><li>In progress</li><li>Proxmox VE</li><li>pfSense</li><li>Active Directory</li><li>Intune</li><li>SCCM</li></ul>
+            </header>
+
+            <section class="case-section">
+                <h2>Goal</h2>
+                <p>Practise a full SCCM to Intune migration somewhere safe: Group Policy, apps, reporting, line-of-business authentication and the Intune Suite features. It builds on the migration I took part in at Redial BPO, where I worked alongside the engineer who led it.</p>
+            </section>
+
+            <section class="case-section">
+                <h2>The lab</h2>
+                <p class="case-note">Hover, tap or tab to a block for details.</p>
+                <figure class="diagram">
+                    <svg class="dg" viewBox="0 0 1000 560" role="img" aria-labelledby="lab-dg-title lab-dg-desc">
+  <title id="lab-dg-title">Endpoint migration lab on Proxmox</title>
+  <desc id="lab-dg-desc">A Proxmox host runs pfSense, two domain controllers, a Windows 11 template and Windows 11 clients on an isolated lab network. The clients connect to Intune and Entra ID.</desc>
+  <defs><marker id="lab-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="dg-arrow"/></marker></defs>
+  <rect class="dg-box" x="30" y="100" width="760" height="440" rx="18"/>
+  <text x="52" y="130" class="dg-cap">Proxmox VE host</text>
+  <g class="dg-node" tabindex="0" data-title="Internet" data-text="The lab's only way out. All traffic from the lab goes through pfSense first.">
+    <rect x="310" y="20" width="200" height="48" rx="12"/><text x="410" y="50" class="dg-t">Internet</text>
+  </g>
+  <g class="dg-node" tabindex="0" data-title="pfSense" data-text="Router and firewall for the lab. Handles VPN access, VLAN separation and traffic filtering, so the lab stays isolated from my home network.">
+    <rect x="300" y="150" width="220" height="64" rx="14"/><text x="410" y="178" class="dg-t">pfSense</text><text x="410" y="200" class="dg-s">VPN, VLANs, filtering</text>
+  </g>
+  <g class="dg-node lan" tabindex="0" data-title="Lab LAN" data-text="The isolated lab network. Every virtual machine sits on it, behind pfSense.">
+    <rect x="60" y="270" width="700" height="34" rx="10"/><text x="410" y="293" class="dg-s">Isolated lab network</text>
+  </g>
+  <g class="dg-node" tabindex="0" data-title="DC01" data-text="Windows Server domain controller running Active Directory, DNS and DHCP for the lab. It holds the GPOs that get inventoried and migrated.">
+    <rect x="60" y="370" width="160" height="90" rx="14"/><text x="140" y="410" class="dg-t">DC01</text><text x="140" y="434" class="dg-s">AD, DNS, DHCP</text>
+  </g>
+  <g class="dg-node planned" tabindex="0" data-title="DC02 (planned)" data-text="A second domain controller, planned as a backup for Active Directory.">
+    <rect x="240" y="370" width="160" height="90" rx="14"/><text x="320" y="410" class="dg-t">DC02</text><text x="320" y="434" class="dg-s">backup AD (planned)</text>
+  </g>
+  <g class="dg-node" tabindex="0" data-title="Windows 11 template" data-text="A prepared Windows 11 VM used as the template, so extra client machines can be cloned quickly.">
+    <rect x="420" y="370" width="160" height="90" rx="14"/><text x="500" y="410" class="dg-t">Win 11 template</text><text x="500" y="434" class="dg-s">for cloning clients</text>
+  </g>
+  <g class="dg-node" tabindex="0" data-title="Windows 11 clients" data-text="Test PCs joined to the domain. They are used to test GPO to Intune policy moves, app deployment and reporting.">
+    <rect x="600" y="370" width="160" height="90" rx="14"/><text x="680" y="410" class="dg-t">Win 11 clients</text><text x="680" y="434" class="dg-s">domain joined</text>
+  </g>
+  <g class="dg-node cloud" tabindex="0" data-title="Intune and Entra ID" data-text="The migration target. Clients are enrolled and managed from the cloud, which is where GPO settings, apps and reporting are rebuilt.">
+    <rect x="830" y="370" width="150" height="90" rx="14"/><text x="905" y="410" class="dg-t">Intune</text><text x="905" y="434" class="dg-s">+ Entra ID</text>
+  </g>
+  <path class="dg-link" d="M410 68V150"/>
+  <path class="dg-link" d="M410 214V270"/>
+  <path class="dg-link" d="M140 304V370"/>
+  <path class="dg-link" d="M320 304V370"/>
+  <path class="dg-link" d="M500 304V370"/>
+  <path class="dg-link" d="M680 304V370"/>
+  <path class="dg-link dg-cloudlink" d="M762 415H828" marker-end="url(#lab-arrow)"/>
+  <text x="795" y="400" class="dg-s dg-tiny">enrol</text>
+</svg>
+                    <div class="dg-info" aria-live="polite"><strong>Select a block</strong><span>Each part of the lab explains what it does.</span></div>
+                </figure>
+            </section>
+
+            <section class="case-section">
+                <h2>What the lab covers</h2>
+                <ul class="case-list">
+                    <li>Moving Group Policy settings to Intune policies.</li>
+                    <li>Packaging and deploying apps through Intune.</li>
+                    <li>Reporting on devices and apps.</li>
+                    <li>Authentication for line-of-business apps.</li>
+                    <li>Intune Suite features such as Endpoint Privilege Management.</li>
+                </ul>
+            </section>
+
+            <section class="case-section">
+                <h2>Where it is now</h2>
+                <p>The first phase is under way: a Windows 11 template, extra client machines, and an inventory of the GPOs and apps that need to move. A second domain controller is planned as an Active Directory backup. The lab runs on a PC with 32 GB of RAM, with Proxmox installed on its own NVMe SSD.</p>
+                <p><a class="view-btn" href="https://github.com/TebohoMotholo/endpoint-migration-lab" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View the lab on GitHub</a></p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img loading="lazy" decoding="async" src="images/logo.png" alt="Teboho Motholo Logo">
+                </div>
+                <div class="footer-links">
+                    <ul>
+                        <p><a href="index.html">Home</a></li>
+                        <p><a href="about.html">About</a></li>
+                        <p><a href="education.html">Education</a></li>
+                        <p><a href="skills.html">Skills</a></li>
+                        <p><a href="employment.html">Experience</a></li>
+                        <p><a href="projects.html">Projects</a></li>
+                        <p><a href="notes.html">Notes</a></li>
+                        <p><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <a href="https://www.linkedin.com/in/teboho-motholo-2589ba160" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/TebohoMotholo" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://twitter.com/MotholoTeboho" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="contact.html" aria-label="Contact me" title="Contact me"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Teboho Motholo. All rights reserved.</p>
+                <p>Developed with ❤️ by Teboho Motholo</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4T293RZ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+</body>
+</html>

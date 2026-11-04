@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     yearSpan.textContent = new Date().getFullYear();
     
     // Initialize particles.js
-    particlesJS('particles-js', {
+    if (typeof particlesJS === 'function') particlesJS('particles-js', {
         "particles": {
             "number": {
-                "value": 80,
+                "value": (window.matchMedia("(max-width: 768px)").matches ? 28 : 80),
                 "density": {
                     "enable": true,
                     "value_area": 800
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 "width": 1
             },
             "move": {
-                "enable": true,
+                "enable": !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
                 "speed": 2,
                 "direction": "none",
                 "random": false,
@@ -144,7 +144,7 @@ navSocial.className = 'nav-item nav-social';
 navSocial.innerHTML =
     '<a href="https://www.linkedin.com/in/teboho-motholo-2589ba160" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>' +
     '<a href="https://github.com/TebohoMotholo" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>' +
-    '<a href="mailto:motholoteboho@yahoo.com" aria-label="Email"><i class="fas fa-envelope"></i></a>';
+    '<a href="contact.html" aria-label="Contact me"><i class="fas fa-envelope"></i></a>';
 navMenu.appendChild(navSocial);
 
 hamburger.setAttribute('role', 'button');
@@ -201,48 +201,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Animate skills on scroll into view
-function animateSkills() {
-    const skills = document.querySelectorAll('.skill');
-    skills.forEach(skill => {
-        const progress = skill.querySelector('.progress');
-        const progressText = progress.querySelector('.progress-text');
-        const targetWidth = parseFloat(getComputedStyle(progress).getPropertyValue('--progress-width'));
 
-        progress.style.width = '0%';
-        progressText.textContent = '0%';
-
-        let currentWidth = 0;
-        const interval = setInterval(() => {
-            if (currentWidth >= targetWidth) {
-                clearInterval(interval);
-            } else {
-                currentWidth++;
-                progress.style.width = currentWidth + '%';
-                progressText.textContent = currentWidth + '%';
-            }
-        }, 50);
-    });
-}
-
-// Detect scroll into view
-function isInViewport(el) {
-    const rect = el.getBoundingClientRect();
-    return (
-        rect.top <= window.innerHeight - 100 && rect.bottom >= 0
-    );
-}
-
-function triggerSkillAnimationOnce() {
-    const skillSection = document.querySelector('#skills');
-    if (isInViewport(skillSection) && !skillSection.classList.contains('animated')) {
-        skillSection.classList.add('animated');
-        animateSkills();
-    }
-}
-
-window.addEventListener('scroll', triggerSkillAnimationOnce);
-window.addEventListener('load', triggerSkillAnimationOnce);
 
 function toggleDetails(entry) {
     const isActive = entry.classList.contains("active");
@@ -352,3 +311,145 @@ if (form) form.addEventListener('submit', function(e) {
         }
     });
 });
+
+
+// ---------------------------------------------------------------------
+// Site configuration. Flip selfHosted to true once this site is served
+// from the Proxmox server; add the Uptime Kuma public status page URL.
+// ---------------------------------------------------------------------
+const SITE_CONFIG = {
+    selfHosted: false,
+    statusPageUrl: ''
+};
+
+(function () {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ----- Theme toggle -----
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        const actions = document.createElement('div');
+        actions.className = 'nav-actions';
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'theme-toggle';
+        const root = document.documentElement;
+        const paint = () => {
+            const light = root.getAttribute('data-theme') === 'light';
+            toggle.innerHTML = light ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            toggle.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+        };
+        toggle.addEventListener('click', () => {
+            const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem('theme', next); } catch (e) {}
+            paint();
+        });
+        paint();
+        actions.appendChild(toggle);
+        const hb = document.getElementById('hamburger');
+        navbar.insertBefore(actions, hb);
+    }
+
+    // ----- Reveal email (kept out of the page source) -----
+    document.querySelectorAll('.reveal-email').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const addr = btn.dataset.u + '@' + btn.dataset.d;
+            const a = document.createElement('a');
+            a.href = 'mailto:' + addr;
+            a.textContent = addr;
+            btn.replaceWith(a);
+        });
+    });
+
+    // ----- CV download button: shown only when the file exists -----
+    const cv = document.getElementById('cv-btn');
+    if (cv && location.protocol.startsWith('http')) {
+        fetch(cv.getAttribute('href'), { method: 'HEAD' })
+            .then(r => { if (r.ok) cv.hidden = false; })
+            .catch(() => {});
+    }
+
+    // ----- Count-up numbers -----
+    const nums = document.querySelectorAll('.stat-num[data-count]');
+    if (nums.length) {
+        const run = (el) => {
+            const target = parseFloat(el.dataset.count);
+            const dec = parseInt(el.dataset.decimals || '0', 10);
+            const suffix = el.dataset.suffix || '';
+            if (reduceMotion) { el.textContent = target.toFixed(dec) + suffix; return; }
+            const start = performance.now();
+            const dur = 1400;
+            const tick = (now) => {
+                const p = Math.min(1, (now - start) / dur);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = (target * eased).toFixed(dec) + suffix;
+                if (p < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        };
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } });
+            }, { threshold: 0.6 });
+            nums.forEach(n => io.observe(n));
+        }
+    }
+
+    // ----- Terminal typing -----
+    const term = document.getElementById('terminal-body');
+    if (term && !reduceMotion && 'IntersectionObserver' in window) {
+        const lines = Array.from(term.querySelectorAll('.t-line'));
+        const texts = lines.map(l => l.textContent);
+        lines.forEach(l => { l.textContent = ''; l.style.visibility = 'hidden'; });
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+        const play = async () => {
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i];
+                l.style.visibility = 'visible';
+                l.classList.add('t-caret');
+                if (l.classList.contains('t-cmd')) {
+                    for (const ch of texts[i]) { l.textContent += ch; await sleep(45); }
+                    await sleep(250);
+                } else {
+                    l.textContent = texts[i];
+                    await sleep(450);
+                }
+                l.classList.remove('t-caret');
+            }
+        };
+        const tio = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) { tio.disconnect(); play(); }
+        }, { threshold: 0.5 });
+        tio.observe(term);
+    }
+
+    // ----- Diagrams: show details for the selected block -----
+    document.querySelectorAll('figure.diagram').forEach(fig => {
+        const info = fig.querySelector('.dg-info');
+        const nodes = fig.querySelectorAll('.dg-node');
+        const show = (n) => {
+            nodes.forEach(x => x.classList.toggle('is-active', x === n));
+            info.innerHTML = '<strong></strong><span></span>';
+            info.querySelector('strong').textContent = n.dataset.title;
+            info.querySelector('span').textContent = n.dataset.text;
+        };
+        nodes.forEach(n => {
+            n.addEventListener('mouseenter', () => show(n));
+            n.addEventListener('focus', () => show(n));
+            n.addEventListener('click', () => show(n));
+        });
+    });
+
+    // ----- Self-hosted badge -----
+    if (SITE_CONFIG.selfHosted) {
+        const bottom = document.querySelector('.footer-bottom');
+        if (bottom) {
+            const el = document.createElement(SITE_CONFIG.statusPageUrl ? 'a' : 'p');
+            el.className = 'hosted-badge';
+            if (SITE_CONFIG.statusPageUrl) { el.href = SITE_CONFIG.statusPageUrl; el.target = '_blank'; el.rel = 'noopener'; }
+            el.innerHTML = '<span class="pulse"></span> Served from my Proxmox home lab' + (SITE_CONFIG.statusPageUrl ? ' | live status' : '');
+            bottom.appendChild(el);
+        }
+    }
+})();

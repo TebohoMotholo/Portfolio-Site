@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Teboho Motholo</title>
+    <meta name="description" content="Short technical notes by Teboho Motholo: FOG network boot with Sophos, Conditional Access error 53003 and packaging apps for Intune.">
+    <meta name="theme-color" content="#2c3e50">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Teboho Motholo">
+    <meta property="og:title" content="Notes - Teboho Motholo">
+    <meta property="og:description" content="Short technical notes by Teboho Motholo: FOG network boot with Sophos, Conditional Access error 53003 and packaging apps for Intune.">
+    <meta property="og:image" content="__SITE_URL__/images/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpg" href="images/logo.png">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T4T293RZ');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <img loading="lazy" decoding="async" src="images/logo.png" alt="Teboho Motholo Logo">
+                </a>
+                <div class="hamburger" id="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+                <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item"><a href="index.html" class="nav-link">HOME</a></li>
+                    <li class="nav-item"><a href="about.html" class="nav-link">ABOUT</a></li>
+                    <li class="nav-item"><a href="education.html" class="nav-link">EDUCATION</a></li>
+                    <li class="nav-item"><a href="skills.html" class="nav-link">SKILLS</a></li>
+                    <li class="nav-item"><a href="employment.html" class="nav-link">EXPERIENCE</a></li>
+                    <li class="nav-item"><a href="projects.html" class="nav-link">PROJECTS</a></li>
+                    <li class="nav-item"><a href="notes.html" class="nav-link active">NOTES</a></li>
+                    <li class="nav-item"><a href="contact.html" class="nav-link">CONTACT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="case notes">
+        <div class="container case-wrap">
+            <header class="case-head">
+                <p class="case-kicker">Notes</p>
+                <h1>Short technical notes</h1>
+                <p class="case-lead">Things I have set up or troubleshot, written down so I can find them again.</p>
+            </header>
+
+            <article class="note" id="fog-sophos">
+                <h2>Network booting FOG from a Sophos firewall</h2>
+                <p class="note-meta">November 2026 | FOG, Sophos XGS, DHCP</p>
+                <p>When the firewall runs DHCP instead of the FOG server, PCs need two extra DHCP options so they know where to boot from.</p>
+                <ol>
+                    <li>Give the FOG server a static IP address.</li>
+                    <li>In the firewall DHCP scope, set <strong>Next server</strong> to the FOG server's IP address.</li>
+                    <li>Set <strong>Boot file</strong> to <code>ipxe.efi</code> for UEFI PCs. Older BIOS PCs use <code>undionly.kpxe</code>. Both files are served from <code>/tftpboot</code> on the FOG server.</li>
+                    <li>Network boot a test PC. It should load iPXE and show the FOG menu.</li>
+                </ol>
+                <p>If a PC stops with <code>PXE-E53: No boot filename received</code>, the Boot file option is missing or not reaching the client. iPXE usually also needs Secure Boot turned off in the PC firmware. Field names in the firewall can differ slightly between firmware versions.</p>
+                <p><a href="case-fog.html">Read the full case study</a></p>
+            </article>
+
+            <article class="note" id="ca-53003">
+                <h2>Error 53003: blocked by Conditional Access</h2>
+                <p class="note-meta">November 2026 | Entra ID, Conditional Access, Intune</p>
+                <p>Error 53003 means a Conditional Access policy blocked the sign-in. The device or user did not meet a condition the policy requires, for example a compliant or registered device, MFA, or an approved app.</p>
+                <ol>
+                    <li>Open the failed sign-in in the Entra ID sign-in logs.</li>
+                    <li>On the <strong>Conditional Access</strong> tab, find the policy marked as failed. That is the policy that blocked it.</li>
+                    <li>Check the <strong>Device info</strong> tab. An unregistered phone usually shows no device ID, so it cannot satisfy a policy that needs a compliant device.</li>
+                    <li>Either enrol the device (for example through the Company Portal app) so it can become compliant, or review whether the policy should apply to that user, app or platform.</li>
+                    <li>Use the <strong>What If</strong> tool to check the result before changing the policy.</li>
+                </ol>
+            </article>
+
+            <article class="note" id="intunewin">
+                <h2>Packaging an app for Intune with the IntuneWin tool</h2>
+                <p class="note-meta">November 2026 | Intune, Win32 apps</p>
+                <p>Intune installs Windows apps from a <code>.intunewin</code> package, which the Microsoft Win32 Content Prep Tool creates from the installer.</p>
+                <ol>
+                    <li>Put the installer and any supporting files in one source folder.</li>
+                    <li>Run the tool against that folder:
+<pre><code>IntuneWinAppUtil.exe -c C:\Source\App -s setup.exe -o C:\Output</code></pre></li>
+                    <li>In Intune, add a <strong>Windows app (Win32)</strong> and upload the <code>.intunewin</code> file.</li>
+                    <li>Set the install and uninstall commands, for example <code>msiexec /i app.msi /qn</code> for an MSI.</li>
+                    <li>Add a detection rule so Intune knows the app is installed, such as the MSI product code, a file or a registry key.</li>
+                    <li>Assign it to a small pilot group first, check it on a device, then widen the assignment.</li>
+                </ol>
+            </article>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img loading="lazy" decoding="async" src="images/logo.png" alt="Teboho Motholo Logo">
+                </div>
+                <div class="footer-links">
+                    <ul>
+                        <p><a href="index.html">Home</a></li>
+                        <p><a href="about.html">About</a></li>
+                        <p><a href="education.html">Education</a></li>
+                        <p><a href="skills.html">Skills</a></li>
+                        <p><a href="employment.html">Experience</a></li>
+                        <p><a href="projects.html">Projects</a></li>
+                        <p><a href="notes.html">Notes</a></li>
+                        <p><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <a href="https://www.linkedin.com/in/teboho-motholo-2589ba160" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/TebohoMotholo" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://twitter.com/MotholoTeboho" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="contact.html" aria-label="Contact me" title="Contact me"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> Teboho Motholo. All rights reserved.</p>
+                <p>Developed with ❤️ by Teboho Motholo</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4T293RZ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+</body>
+</html>
