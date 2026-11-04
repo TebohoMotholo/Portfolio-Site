@@ -1380,9 +1380,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4.5rem;
+  font-size: 1rem;
   color: var(--primary-color);
   background: rgba(255, 255, 255, 0.05);
+}
+.project-image-icon > i {
+  font-size: 4.5rem;
+}
+.project-image-icon .project-links {
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+.project-image-icon .project-link i {
+  font-size: 1rem;
 }
 
 
