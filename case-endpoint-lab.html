@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case Study: Endpoint Migration Lab - Teboho Motholo</title>
-    <meta name="description" content="A Proxmox home lab with pfSense and Active Directory for practising an SCCM to Intune migration: GPO, apps, reporting and Intune Suite.">
+    <meta name="description" content="Endpoint migration lab: a Windows estate built on Proxmox and moved from Active Directory, Group Policy and Configuration Manager to Entra ID and Intune.">
     <meta name="theme-color" content="#2c3e50">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Teboho Motholo">
     <meta property="og:title" content="Case Study: Endpoint Migration Lab - Teboho Motholo">
-    <meta property="og:description" content="A Proxmox home lab with pfSense and Active Directory for practising an SCCM to Intune migration: GPO, apps, reporting and Intune Suite.">
+    <meta property="og:description" content="Endpoint migration lab: a Windows estate built on Proxmox and moved from Active Directory, Group Policy and Configuration Manager to Entra ID and Intune.">
     <meta property="og:image" content="https://tebohomotholo.netlify.app/images/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
@@ -62,13 +62,14 @@
             <header class="case-head">
                 <p class="case-kicker">Case study</p>
                 <h1>Endpoint migration lab</h1>
-                <p class="case-lead">A Proxmox lab for practising an SCCM to Intune migration end to end.</p>
-                <ul class="chips"><li>In progress</li><li>Proxmox VE</li><li>pfSense</li><li>Active Directory</li><li>Intune</li><li>SCCM</li></ul>
+                <p class="case-lead">A small company's Windows estate, built from scratch on one PC and moved from Active Directory, Group Policy and Configuration Manager to Microsoft Entra ID and Intune.</p>
+                <ul class="chips"><li>Completed Nov 2026</li><li>Proxmox VE</li><li>pfSense</li><li>Active Directory</li><li>Configuration Manager</li><li>Entra ID</li><li>Intune</li></ul>
             </header>
 
             <section class="case-section">
                 <h2>Goal</h2>
-                <p>Practise a full SCCM to Intune migration somewhere safe: Group Policy, apps, reporting, line-of-business authentication and the Intune Suite features. It builds on the migration I took part in at Redial BPO, where I worked alongside the engineer who led it.</p>
+                <p>Run a full SCCM to Intune migration from start to finish, the way an enterprise would: build the on-premises estate first, then move it to the cloud one workload at a time. It builds on the migration I took part in at Redial BPO, where I worked alongside the engineer who led it.</p>
+                <p><strong>This is a home lab, not a production environment.</strong> It runs on one PC and a Microsoft 365 trial tenant. I built, broke and fixed every part of it myself.</p>
             </section>
 
             <section class="case-section">
@@ -77,62 +78,107 @@
                 <figure class="diagram">
                     <svg class="dg" viewBox="0 0 1000 560" role="img" aria-labelledby="lab-dg-title lab-dg-desc">
   <title id="lab-dg-title">Endpoint migration lab on Proxmox</title>
-  <desc id="lab-dg-desc">A Proxmox host runs pfSense, two domain controllers, a Windows 11 template and Windows 11 clients on an isolated lab network. The clients connect to Intune and Entra ID.</desc>
+  <desc id="lab-dg-desc">A Proxmox host runs pfSense and an isolated lab network. On it sit two domain controllers, a file server running Entra Connect, a Configuration Manager server, a Linux web server and four Windows 11 clients. The clients and the sync connect to Entra ID and Intune in a Microsoft 365 tenant.</desc>
   <defs><marker id="lab-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="dg-arrow"/></marker></defs>
-  <rect class="dg-box" x="30" y="100" width="760" height="440" rx="18"/>
-  <text x="52" y="130" class="dg-cap">Proxmox VE host</text>
+  <rect class="dg-box" x="20" y="100" width="790" height="440" rx="18"/>
+  <text x="42" y="130" class="dg-cap">Proxmox VE host</text>
   <g class="dg-node" tabindex="0" data-title="Internet" data-text="The lab's only way out. All traffic from the lab goes through pfSense first.">
     <rect x="310" y="20" width="200" height="48" rx="12"/><text x="410" y="50" class="dg-t">Internet</text>
   </g>
-  <g class="dg-node" tabindex="0" data-title="pfSense" data-text="Router and firewall for the lab. Handles VPN access, VLAN separation and traffic filtering, so the lab stays isolated from my home network.">
-    <rect x="300" y="150" width="220" height="64" rx="14"/><text x="410" y="178" class="dg-t">pfSense</text><text x="410" y="200" class="dg-s">VPN, VLANs, filtering</text>
+  <g class="dg-node" tabindex="0" data-title="pfSense" data-text="Firewall, router and NAT for the lab. WireGuard gives me remote admin access. Only pfSense touches both the outside network and the lab.">
+    <rect x="300" y="150" width="220" height="64" rx="14"/><text x="410" y="178" class="dg-t">pfSense</text><text x="410" y="200" class="dg-s">NAT, WireGuard, firewall</text>
   </g>
-  <g class="dg-node lan" tabindex="0" data-title="Lab LAN" data-text="The isolated lab network. Every virtual machine sits on it, behind pfSense.">
-    <rect x="60" y="270" width="700" height="34" rx="10"/><text x="410" y="293" class="dg-s">Isolated lab network</text>
+  <g class="dg-node lan" tabindex="0" data-title="Lab LAN" data-text="10.10.10.0/24 on a Proxmox bridge with no physical port, so the lab's DHCP and Active Directory can never leak onto a real network.">
+    <rect x="36" y="270" width="758" height="34" rx="10"/><text x="415" y="293" class="dg-s">Isolated lab network 10.10.10.0/24</text>
   </g>
-  <g class="dg-node" tabindex="0" data-title="DC01" data-text="Windows Server domain controller running Active Directory, DNS and DHCP for the lab. It holds the GPOs that get inventoried and migrated.">
-    <rect x="60" y="370" width="160" height="90" rx="14"/><text x="140" y="410" class="dg-t">DC01</text><text x="140" y="434" class="dg-s">AD, DNS, DHCP</text>
+  <g class="dg-node" tabindex="0" data-title="DC01" data-text="Windows Server domain controller running Active Directory, DNS and DHCP. It holds the GPOs that were inventoried and migrated.">
+    <rect x="36" y="370" width="118" height="90" rx="14"/><text x="95" y="410" class="dg-t">DC01</text><text x="95" y="434" class="dg-s">AD, DNS, DHCP</text>
   </g>
-  <g class="dg-node planned" tabindex="0" data-title="DC02 (planned)" data-text="A second domain controller, planned as a backup for Active Directory.">
-    <rect x="240" y="370" width="160" height="90" rx="14"/><text x="320" y="410" class="dg-t">DC02</text><text x="320" y="434" class="dg-s">backup AD (planned)</text>
+  <g class="dg-node" tabindex="0" data-title="DC02" data-text="A second domain controller for redundancy. Replication failed with error 1398 because of a clock mismatch, and my evidence scripts caught it.">
+    <rect x="164" y="370" width="118" height="90" rx="14"/><text x="223" y="410" class="dg-t">DC02</text><text x="223" y="434" class="dg-s">AD, DNS</text>
   </g>
-  <g class="dg-node" tabindex="0" data-title="Windows 11 template" data-text="A prepared Windows 11 VM used as the template, so extra client machines can be cloned quickly.">
-    <rect x="420" y="370" width="160" height="90" rx="14"/><text x="500" y="410" class="dg-t">Win 11 template</text><text x="500" y="434" class="dg-s">for cloning clients</text>
+  <g class="dg-node" tabindex="0" data-title="FS01" data-text="File server with the shared folders. It also runs Entra Connect Sync, which syncs the lab users and devices to Entra ID.">
+    <rect x="292" y="370" width="118" height="90" rx="14"/><text x="351" y="410" class="dg-t">FS01</text><text x="351" y="434" class="dg-s">Entra Connect</text>
   </g>
-  <g class="dg-node" tabindex="0" data-title="Windows 11 clients" data-text="Test PCs joined to the domain. They are used to test GPO to Intune policy moves, app deployment and reporting.">
-    <rect x="600" y="370" width="160" height="90" rx="14"/><text x="680" y="410" class="dg-t">Win 11 clients</text><text x="680" y="434" class="dg-s">domain joined</text>
+  <g class="dg-node" tabindex="0" data-title="CM01" data-text="Configuration Manager primary site with SQL Server. This is the 'before' state: apps and policy managed on-premises, then moved to Intune through co-management.">
+    <rect x="420" y="370" width="118" height="90" rx="14"/><text x="479" y="410" class="dg-t">CM01</text><text x="479" y="434" class="dg-s">ConfigMgr, SQL</text>
   </g>
-  <g class="dg-node cloud" tabindex="0" data-title="Intune and Entra ID" data-text="The migration target. Clients are enrolled and managed from the cloud, which is where GPO settings, apps and reporting are rebuilt.">
-    <rect x="830" y="370" width="150" height="90" rx="14"/><text x="905" y="410" class="dg-t">Intune</text><text x="905" y="434" class="dg-s">+ Entra ID</text>
+  <g class="dg-node" tabindex="0" data-title="web01" data-text="A Debian container running Nginx as an internal line-of-business web app, used to test app sign-in.">
+    <rect x="548" y="370" width="118" height="90" rx="14"/><text x="607" y="410" class="dg-t">web01</text><text x="607" y="434" class="dg-s">Nginx LOB app</text>
+  </g>
+  <g class="dg-node" tabindex="0" data-title="Windows 11 clients" data-text="Four Windows 11 clients cloned from a sysprepped template. client02 is the pilot device: hybrid joined and co-managed by ConfigMgr and Intune.">
+    <rect x="676" y="370" width="118" height="90" rx="14"/><text x="735" y="410" class="dg-t">Clients</text><text x="735" y="434" class="dg-s">4x Windows 11</text>
+  </g>
+  <g class="dg-node cloud" tabindex="0" data-title="Entra ID and Intune" data-text="A Microsoft 365 trial tenant. This is the migration target, where policies, apps and the Intune Suite features were rebuilt.">
+    <rect x="840" y="370" width="145" height="90" rx="14"/><text x="912" y="410" class="dg-t">Entra ID</text><text x="912" y="434" class="dg-s">+ Intune</text>
   </g>
   <path class="dg-link" d="M410 68V150"/>
   <path class="dg-link" d="M410 214V270"/>
-  <path class="dg-link" d="M140 304V370"/>
-  <path class="dg-link" d="M320 304V370"/>
-  <path class="dg-link" d="M500 304V370"/>
-  <path class="dg-link" d="M680 304V370"/>
-  <path class="dg-link dg-cloudlink" d="M762 415H828" marker-end="url(#lab-arrow)"/>
-  <text x="795" y="400" class="dg-s dg-tiny">enrol</text>
+  <path class="dg-link" d="M95 304V370"/>
+  <path class="dg-link" d="M223 304V370"/>
+  <path class="dg-link" d="M351 304V370"/>
+  <path class="dg-link" d="M479 304V370"/>
+  <path class="dg-link" d="M607 304V370"/>
+  <path class="dg-link" d="M735 304V370"/>
+  <path class="dg-link dg-cloudlink" d="M796 415H838" marker-end="url(#lab-arrow)"/>
+  <text x="817" y="400" class="dg-s dg-tiny">enrol</text>
 </svg>
                     <div class="dg-info" aria-live="polite"><strong>Select a block</strong><span>Each part of the lab explains what it does.</span></div>
                 </figure>
             </section>
 
             <section class="case-section">
-                <h2>What the lab covers</h2>
+                <h2>What I built</h2>
                 <ul class="case-list">
-                    <li>Moving Group Policy settings to Intune policies.</li>
-                    <li>Packaging and deploying apps through Intune.</li>
-                    <li>Reporting on devices and apps.</li>
-                    <li>Authentication for line-of-business apps.</li>
-                    <li>Intune Suite features such as Endpoint Privilege Management.</li>
+                    <li><strong>Virtualisation and network:</strong> Proxmox VE with two bridges (one isolated), pfSense with NAT and WireGuard, and scheduled backups to an external drive with retention.</li>
+                    <li><strong>Identity:</strong> Active Directory with two domain controllers, DNS and DHCP, then Entra Connect Sync and hybrid join to Entra ID.</li>
+                    <li><strong>On-premises management:</strong> Group Policy, file services, and a Configuration Manager site with SQL Server.</li>
+                    <li><strong>Cloud management:</strong> Intune with co-management, Group Policy analytics, Settings catalog profiles and Win32 apps.</li>
+                    <li><strong>Intune Suite:</strong> Endpoint Privilege Management, Windows Autopatch and Remote Help.</li>
                 </ul>
             </section>
 
             <section class="case-section">
-                <h2>Where it is now</h2>
-                <p>The first phase is under way: a Windows 11 template, extra client machines, and an inventory of the GPOs and apps that need to move. A second domain controller is planned as an Active Directory backup. The lab runs on a PC with 32 GB of RAM, with Proxmox installed on its own NVMe SSD.</p>
-                <p><a class="view-btn" href="https://github.com/TebohoMotholo/endpoint-migration-lab" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View the lab on GitHub</a></p>
+                <h2>What I migrated</h2>
+                <ul class="case-list">
+                    <li>Exported every Group Policy Object, ran them through Group Policy analytics, and rebuilt the supported settings as Intune profiles. Validated on a pilot device first.</li>
+                    <li>Repackaged Configuration Manager apps as Intune Win32 apps. 7-Zip installs through Intune on the pilot devices.</li>
+                    <li>Moved the pilot device to co-management, with workloads handed from Configuration Manager to Intune one at a time.</li>
+                    <li>Collected evidence for every phase with read-only PowerShell and bash scripts, plus 34 portal screenshots. Secrets, tenant IDs and public IPs are redacted.</li>
+                </ul>
+            </section>
+
+            <section class="case-section">
+                <h2>Problems I solved</h2>
+                <p>Eleven real issues are written up with symptom, diagnosis, root cause and fix. Some of them:</p>
+                <ul class="case-list">
+                    <li><strong>Entra Connect failed with AADSTS700027.</strong> The certificate looked expired but was not valid yet. Every server was in the wrong time zone, so UTC was 9 hours ahead. Nothing on-premises noticed because all the servers were wrong together.</li>
+                    <li><strong>ConfigMgr failed every SQL check.</strong> The real cause was TCP/IP being off on SQL Server, not the settings the check named. I found it by connecting the way Setup does, using the server name.</li>
+                    <li><strong>Sysprep blocked on the Windows 11 template.</strong> The virtual TPM made Windows turn on BitLocker by itself. The log said so in one line.</li>
+                    <li><strong>A Win32 app failed on every device.</strong> The same error on a fresh device pointed at the package. One wrong install command.</li>
+                    <li><strong>DC02 stopped replicating.</strong> Error 1398 means the clocks differ. The time fix had only been applied to the other servers.</li>
+                </ul>
+            </section>
+
+            <section class="case-section">
+                <h2>What is still open</h2>
+                <p>I am listing these on purpose, because the lab is a practice environment and not everything reached the end.</p>
+                <ul class="case-list">
+                    <li>Windows Autopilot: the profile and group are built, but no device has been registered yet.</li>
+                    <li>Windows Hello with Cloud Kerberos Trust: the cloud ticket is issued and file shares open without a prompt, but a Hello PIN is not provisioned yet.</li>
+                    <li>VLC Win32 app: the install command is fixed and waiting on a retry.</li>
+                    <li>Next phase: Conditional Access, BitLocker, LAPS and attack surface reduction, then Azure Virtual Desktop, Windows 365 and retiring Configuration Manager.</li>
+                </ul>
+            </section>
+
+            <section class="case-section">
+                <h2>Read more</h2>
+                <p>The repo has the build docs for every phase, the scripts, sanitised configs, the evidence pack and the full lessons learned.</p>
+                <p>
+                    <a class="view-btn" href="https://github.com/TebohoMotholo/endpoint-migration-lab" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View the lab on GitHub</a>
+                    <a class="view-btn" href="https://github.com/TebohoMotholo/endpoint-migration-lab/blob/main/case-study.pdf" target="_blank" rel="noopener"><i class="fas fa-file-pdf" aria-hidden="true"></i> Case study PDF</a>
+                    <a class="view-btn" href="https://github.com/TebohoMotholo/endpoint-migration-lab/blob/main/docs/lessons-learned.md" target="_blank" rel="noopener"><i class="fas fa-book-open" aria-hidden="true"></i> Lessons learned</a>
+                </p>
             </section>
         </div>
     </main>
